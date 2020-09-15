@@ -124,8 +124,8 @@ window.addEventListener('DOMContentLoaded', () => {
     // модальное окно 
 
     const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'),
-        modalCloseBtn = document.querySelector('[data-close]');
+        modal = document.querySelector('.modal');
+    // modalCloseBtn = document.querySelector('[data-close]');
 
     function openModal() {
         modal.classList.add('show');
@@ -149,12 +149,12 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    modalCloseBtn.addEventListener('click', closeModal);
+    // modalCloseBtn.addEventListener('click', closeModal);
 
     // руализуем функционал при клике на подложку закрывается модальнео окно 
 
     modal.addEventListener('click', (event) => {
-        if (event.target === modal) {
+        if (event.target === modal || event.target.getAttribute('data-close') == '') {
             closeModal();
         }
     });
@@ -168,7 +168,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // создем функционал, при котором с течением времени будет появлятсья модальнео окно 
 
-    const modalTimerId = setTimeout(openModal, 5000);
+    const modalTimerId = setTimeout(openModal, 50000);
 
     // реаизуем функциона, если пользователь долистал доконца странице, появистя модальнео окно 
 
@@ -269,7 +269,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const forms = document.querySelectorAll('form');
 
     const message = {
-        loading: 'Загрузка',
+        loading: 'img/form/spinner.svg',
         success: 'Спасибо! Скоро с вами свяжемся',
         failure: 'Что-то пошло не так...'
     };
@@ -280,19 +280,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function postDate(form) {
         form.addEventListener('submit', (event) => {
-               event.preventDefault();
+            event.preventDefault();
 
-               const statusMessage = document.createElement('div');
-               statusMessage.classList.add('status');
-               statusMessage.textContent = message.loading;
-               form.append(statusMessage);
+            const statusMessage = document.createElement('div');
+            statusMessage.src = message.loading;
+            //    statusMessage.textContent = message.loading;
+            statusMessage.style.cssText = `
+                display: block;
+                margin: 0 auto;
+               `;
+            // form.append(statusMessage);
+            form.insertAdjacentElement('afterend', statusMessage);
 
-               const request = new XMLHttpRequest();
-               request.open('POST', 'server.php');
+            const request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
 
             //    объект, который позволяет с определеннй оформы быстр осформирвоать все данные( формат ключ = значение)
 
-            // когда используем связку  XMLHttpRequest   и   FormData заголовок 'multipart/form-date' устанавливат ьненужно 
+            // когда используем связку  XMLHttpRequest   и   FormData заголовок 'multipart/form-date' устанавливать не нужно 
             // request.setRequestHeader('Content-type', 'multipart/form-date');
 
 
@@ -302,8 +307,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
             // функционал для переноса формдаты в формат джейсон 
             const object = {};
-            formData.forEach(function(value, key) {
-                 object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
+            formData.forEach(function (value, key) {
+                object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
             });
 
             const json = JSON.stringify(object);
@@ -313,17 +318,44 @@ window.addEventListener('DOMContentLoaded', () => {
 
             request.addEventListener('load', () => {
                 if (request.status === 200) {
-                    statusMessage.textContent = message.success;
+                    showThanksModal(message.success);
+                    // statusMessage.textContent = message.success;
                     form.reset();
-                    setTimeout(() => {
-                       statusMessage.remove();
-                    }, 2000);
+                    // setTimeout(() => {
+                    //    statusMessage.remove();
+                    // }, 2000);
+                    statusMessage.remove();
                 } else {
-                    statusMessage.textContent = message.failure;
+                    // statusMessage.textContent = message.failure;
+                    showThanksModal(message.failure);
                 }
-                
+
             });
         });
+    }
+
+    // created custom alert 
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog');
+
+        prevModalDialog.classList.add('hide');
+        openModal();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+        document.querySelector('.modal').append(thanksModal);
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+        }, 4000);
     }
 
 });
