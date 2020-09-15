@@ -263,4 +263,70 @@ window.addEventListener('DOMContentLoaded', () => {
         '.menu .container',
         'menu__item'
     ).render();
+
+    // created forms 
+
+    const forms = document.querySelectorAll('form');
+
+    const message = {
+        loading: 'Загрузка',
+        success: 'Спасибо! Скоро с вами свяжемся',
+        failure: 'Что-то пошло не так...'
+    };
+
+    forms.forEach(item => {
+        postDate(item);
+    });
+
+    function postDate(form) {
+        form.addEventListener('submit', (event) => {
+               event.preventDefault();
+
+               const statusMessage = document.createElement('div');
+               statusMessage.classList.add('status');
+               statusMessage.textContent = message.loading;
+               form.append(statusMessage);
+
+               const request = new XMLHttpRequest();
+               request.open('POST', 'server.php');
+
+            //    объект, который позволяет с определеннй оформы быстр осформирвоать все данные( формат ключ = значение)
+
+            // когда используем связку  XMLHttpRequest   и   FormData заголовок 'multipart/form-date' устанавливат ьненужно 
+            // request.setRequestHeader('Content-type', 'multipart/form-date');
+
+
+            // для отправки данных в формате json 
+            request.setRequestHeader('Content-type', 'application/json');
+            const formData = new FormData(form);
+
+            // функционал для переноса формдаты в формат джейсон 
+            const object = {};
+            formData.forEach(function(value, key) {
+                 object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
+            });
+
+            const json = JSON.stringify(object);
+
+            // request.send(formData);
+            request.send(json);
+
+            request.addEventListener('load', () => {
+                if (request.status === 200) {
+                    statusMessage.textContent = message.success;
+                    form.reset();
+                    setTimeout(() => {
+                       statusMessage.remove();
+                    }, 2000);
+                } else {
+                    statusMessage.textContent = message.failure;
+                }
+                
+            });
+        });
+    }
+
 });
+
+
+
