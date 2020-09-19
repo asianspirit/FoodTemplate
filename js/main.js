@@ -233,38 +233,166 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // используем объект на месте
     // когда нужно использовать толкьо 1н раз 
-    new MenuCard(
-        "img/tabs/vegy.jpg",
-        "vegy",
-        'Меню "Фитнес"',
-        'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-        9,
-        '.menu .container',
-        'menu__item',
-        'big'
-    ).render();
 
-    new MenuCard(
-        "img/tabs/elite.jpg",
-        "elite",
-        'Меню “Премиум”',
-        'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-        15,
-        '.menu .container',
-        'menu__item'
-    ).render();
+// запрос для поулчения данных из бд с карточками твоаров 
+    const getResource = async (url) => {
+        const result = await fetch(url);
+        // т.к fetch не видит ошибки 404, которая возникает при неправиьном адресе к бд, необходимо вручную создать лсовие на рповерку 
+        // 2 свойства .ok 
+        // 2 свойство .status 
+if (!result.ok) {
+    // объект ошибки 
+    throw new Error(`Could nit fetch ${url}, status: ${result.status}`);
+}
 
-    new MenuCard(
-        "img/tabs/post.jpg",
-        "post",
-        'Меню "Постное"',
-        'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-        25,
-        '.menu .container',
-        'menu__item'
-    ).render();
+        return await result.json();
+  };
+
+
+getResource('http://localhost:3000/menu')
+.then(data => {
+// используем деструктуризацию объекта(вытаскиваем отдельнео свойства в качесвте отдельного объекта) 
+     data.forEach(({img, altimg, title, descr, price}) => {
+        //  этот конструктор будет создавать столкьо раз, сколкьо объектов внутри массива, котоыйр рпидет с сервера
+         new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+     });
+});
+
+// 2 вариант, в котором не будет создавать новый обект, а сразу формироваться вертска с нвоыми картчоками 
+// getResource('http://localhost:3000/menu')
+// .then(data => createCard(data));
+
+
+// function createCard(data) {
+//     data.forEach(({img, altimg, title, descr, price}) => {
+//         const element = document.createElement('div');
+
+//         element.classList.add('menu__item');
+
+//         element.innerHTML = `
+//         <img src=${img} alt=${altimg}
+//         <h3 class="menu__item-subtitle">${title}</h3>
+//         <div class="menu__item-descr">${descr}</div>
+//         <div class="menu__item-divider"></div>
+//         <div class="menu__item-price">
+//             <div class="menu__item-cost">Цена:</div>
+//             <div class="menu__item-total"><span>${price}</span> грн/день</div>
+//         </div>
+//         `;
+
+//         document.querySelector('.menu .container').append(element);
+//     });
+// }
+
+
 
     // created forms 
+
+    // const forms = document.querySelectorAll('form');
+
+    // const message = {
+    //     loading: 'img/form/spinner.svg',
+    //     success: 'Спасибо! Скоро с вами свяжемся',
+    //     failure: 'Что-то пошло не так...'
+    // };
+
+    // forms.forEach(item => {
+    //     postDate(item);
+    // });
+
+    // function postDate(form) {
+    //     form.addEventListener('submit', (event) => {
+    //         event.preventDefault();
+
+    //         const statusMessage = document.createElement('div');
+    //         statusMessage.src = message.loading;
+    //         //    statusMessage.textContent = message.loading;
+    //         statusMessage.style.cssText = `
+    //             display: block;
+    //             margin: 0 auto;
+    //            `;
+    //         // form.append(statusMessage);
+    //         form.insertAdjacentElement('afterend', statusMessage);
+
+    //         const request = new XMLHttpRequest();
+    //         request.open('POST', 'server.php');
+
+    //         //    объект, который позволяет с определеннй оформы быстр осформирвоать все данные( формат ключ = значение)
+
+    //         // когда используем связку  XMLHttpRequest   и   FormData заголовок 'multipart/form-date' устанавливать не нужно 
+    //         // request.setRequestHeader('Content-type', 'multipart/form-date');
+
+
+    //         // для отправки данных в формате json 
+    //         request.setRequestHeader('Content-type', 'application/json');
+    //         const formData = new FormData(form);
+
+    //         // функционал для переноса формдаты в формат джейсон 
+    //         const object = {};
+    //         formData.forEach(function (value, key) {
+    //             object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
+    //         });
+
+    //         const json = JSON.stringify(object);
+
+    //         // request.send(formData);
+    //         request.send(json);
+
+    //         request.addEventListener('load', () => {
+    //             if (request.status === 200) {
+    //                 showThanksModal(message.success);
+    //                 // statusMessage.textContent = message.success;
+    //                 form.reset();
+    //                 // setTimeout(() => {
+    //                 //    statusMessage.remove();
+    //                 // }, 2000);
+    //                 statusMessage.remove();
+    //             } else {
+    //                 // statusMessage.textContent = message.failure;
+    //                 showThanksModal(message.failure);
+    //             }
+
+    //         });
+    //     });
+    // }
+
+    // // created custom alert 
+    // function showThanksModal(message) {
+    //     const prevModalDialog = document.querySelector('.modal__dialog');
+
+    //     prevModalDialog.classList.add('hide');
+    //     openModal();
+
+    //     const thanksModal = document.createElement('div');
+    //     thanksModal.classList.add('modal__dialog');
+    //     thanksModal.innerHTML = `
+    //         <div class="modal__content">
+    //             <div class="modal__close" data-close>×</div>
+    //             <div class="modal__title">${message}</div>
+    //         </div>
+    //     `;
+    //     document.querySelector('.modal').append(thanksModal);
+    //     setTimeout(() => {
+    //         thanksModal.remove();
+    //         prevModalDialog.classList.add('show');
+    //         prevModalDialog.classList.remove('hide');
+    //         closeModal();
+    //     }, 4000);
+    // }
+
+    // пример 
+    // fetch('https://jsonplaceholder.typicode.com/posts', {
+    //     method: 'POST',
+    //     body: JSON.stringify({NAME: 'Alex'}),
+    //     headers: {
+    //         'Content-type': 'application/json'
+    //     }
+    // })
+    //     .then(response => response.json())
+    //     .then(json => console.log(json));
+
+
+    // переписываем функционал на fetch API 
 
     const forms = document.querySelectorAll('form');
 
@@ -275,10 +403,23 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     forms.forEach(item => {
-        postDate(item);
+        bindPostDate(item);
     });
 
-    function postDate(form) {
+    const postDate = async (url, data) => {
+          const result = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: data
+          });
+
+
+          return await result.json();
+    };
+
+    function bindPostDate(form) {
         form.addEventListener('submit', (event) => {
             event.preventDefault();
 
@@ -286,51 +427,41 @@ window.addEventListener('DOMContentLoaded', () => {
             statusMessage.src = message.loading;
             //    statusMessage.textContent = message.loading;
             statusMessage.style.cssText = `
-                display: block;
-                margin: 0 auto;
-               `;
+            display: block;
+            margin: 0 auto;
+           `;
             // form.append(statusMessage);
             form.insertAdjacentElement('afterend', statusMessage);
 
-            const request = new XMLHttpRequest();
-            request.open('POST', 'server.php');
-
-            //    объект, который позволяет с определеннй оформы быстр осформирвоать все данные( формат ключ = значение)
-
-            // когда используем связку  XMLHttpRequest   и   FormData заголовок 'multipart/form-date' устанавливать не нужно 
-            // request.setRequestHeader('Content-type', 'multipart/form-date');
 
 
-            // для отправки данных в формате json 
-            request.setRequestHeader('Content-type', 'application/json');
             const formData = new FormData(form);
 
             // функционал для переноса формдаты в формат джейсон 
-            const object = {};
-            formData.forEach(function (value, key) {
-                object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
-            });
+            // const object = {};
+            // formData.forEach(function (value, key) {
+            //     object[key] = value; // так мы получаем обычный объект, а не формдату можем использоват ьконвертацию в json
+            // });
 
-            const json = JSON.stringify(object);
+            // новый метод для преобразования в формат json 
+            // испольузем метод entries, который позволяет превратить свойства объекта в мини масивы(а сам объект в матрицу с этими масивами) 
+            // обратный метод fromEntries 
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
+            
+            
 
-            // request.send(formData);
-            request.send(json);
 
-            request.addEventListener('load', () => {
-                if (request.status === 200) {
+            postDate('http://localhost:3000/requests', json)
+                .then(data => {
+                    console.log(data);
                     showThanksModal(message.success);
-                    // statusMessage.textContent = message.success;
-                    form.reset();
-                    // setTimeout(() => {
-                    //    statusMessage.remove();
-                    // }, 2000);
                     statusMessage.remove();
-                } else {
-                    // statusMessage.textContent = message.failure;
+                }).catch(() => {
                     showThanksModal(message.failure);
-                }
+                }).finally(() => {
+                    form.reset();
+                });
 
-            });
         });
     }
 
@@ -344,11 +475,11 @@ window.addEventListener('DOMContentLoaded', () => {
         const thanksModal = document.createElement('div');
         thanksModal.classList.add('modal__dialog');
         thanksModal.innerHTML = `
-            <div class="modal__content">
-                <div class="modal__close" data-close>×</div>
-                <div class="modal__title">${message}</div>
-            </div>
-        `;
+        <div class="modal__content">
+            <div class="modal__close" data-close>×</div>
+            <div class="modal__title">${message}</div>
+        </div>
+    `;
         document.querySelector('.modal').append(thanksModal);
         setTimeout(() => {
             thanksModal.remove();
@@ -357,6 +488,11 @@ window.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 4000);
     }
+
+    fetch('db.json')
+    .then(data => data.json())
+    .then(res => console.log(res));
+
 
 });
 
