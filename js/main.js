@@ -234,55 +234,55 @@ window.addEventListener('DOMContentLoaded', () => {
     // используем объект на месте
     // когда нужно использовать толкьо 1н раз 
 
-// запрос для поулчения данных из бд с карточками твоаров 
+    // запрос для поулчения данных из бд с карточками твоаров 
     const getResource = async (url) => {
         const result = await fetch(url);
         // т.к fetch не видит ошибки 404, которая возникает при неправиьном адресе к бд, необходимо вручную создать лсовие на рповерку 
         // 2 свойства .ok 
         // 2 свойство .status 
-if (!result.ok) {
-    // объект ошибки 
-    throw new Error(`Could nit fetch ${url}, status: ${result.status}`);
-}
+        if (!result.ok) {
+            // объект ошибки 
+            throw new Error(`Could nit fetch ${url}, status: ${result.status}`);
+        }
 
         return await result.json();
-  };
+    };
 
 
-getResource('http://localhost:3000/menu')
-.then(data => {
-// используем деструктуризацию объекта(вытаскиваем отдельнео свойства в качесвте отдельного объекта) 
-     data.forEach(({img, altimg, title, descr, price}) => {
-        //  этот конструктор будет создавать столкьо раз, сколкьо объектов внутри массива, котоыйр рпидет с сервера
-         new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-     });
-});
+    getResource('http://localhost:3000/menu')
+        .then(data => {
+            // используем деструктуризацию объекта(вытаскиваем отдельнео свойства в качесвте отдельного объекта) 
+            data.forEach(({ img, altimg, title, descr, price }) => {
+                //  этот конструктор будет создавать столкьо раз, сколкьо объектов внутри массива, котоыйр рпидет с сервера
+                new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
 
-// 2 вариант, в котором не будет создавать новый обект, а сразу формироваться вертска с нвоыми картчоками 
-// getResource('http://localhost:3000/menu')
-// .then(data => createCard(data));
+    // 2 вариант, в котором не будет создавать новый обект, а сразу формироваться вертска с нвоыми картчоками 
+    // getResource('http://localhost:3000/menu')
+    // .then(data => createCard(data));
 
 
-// function createCard(data) {
-//     data.forEach(({img, altimg, title, descr, price}) => {
-//         const element = document.createElement('div');
+    // function createCard(data) {
+    //     data.forEach(({img, altimg, title, descr, price}) => {
+    //         const element = document.createElement('div');
 
-//         element.classList.add('menu__item');
+    //         element.classList.add('menu__item');
 
-//         element.innerHTML = `
-//         <img src=${img} alt=${altimg}
-//         <h3 class="menu__item-subtitle">${title}</h3>
-//         <div class="menu__item-descr">${descr}</div>
-//         <div class="menu__item-divider"></div>
-//         <div class="menu__item-price">
-//             <div class="menu__item-cost">Цена:</div>
-//             <div class="menu__item-total"><span>${price}</span> грн/день</div>
-//         </div>
-//         `;
+    //         element.innerHTML = `
+    //         <img src=${img} alt=${altimg}
+    //         <h3 class="menu__item-subtitle">${title}</h3>
+    //         <div class="menu__item-descr">${descr}</div>
+    //         <div class="menu__item-divider"></div>
+    //         <div class="menu__item-price">
+    //             <div class="menu__item-cost">Цена:</div>
+    //             <div class="menu__item-total"><span>${price}</span> грн/день</div>
+    //         </div>
+    //         `;
 
-//         document.querySelector('.menu .container').append(element);
-//     });
-// }
+    //         document.querySelector('.menu .container').append(element);
+    //     });
+    // }
 
 
 
@@ -407,16 +407,16 @@ getResource('http://localhost:3000/menu')
     });
 
     const postDate = async (url, data) => {
-          const result = await fetch(url, {
+        const result = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
             },
             body: data
-          });
+        });
 
 
-          return await result.json();
+        return await result.json();
     };
 
     function bindPostDate(form) {
@@ -447,8 +447,8 @@ getResource('http://localhost:3000/menu')
             // испольузем метод entries, который позволяет превратить свойства объекта в мини масивы(а сам объект в матрицу с этими масивами) 
             // обратный метод fromEntries 
             const json = JSON.stringify(Object.fromEntries(formData.entries()));
-            
-            
+
+
 
 
             postDate('http://localhost:3000/requests', json)
@@ -490,10 +490,235 @@ getResource('http://localhost:3000/menu')
     }
 
     fetch('db.json')
-    .then(data => data.json())
-    .then(res => console.log(res));
+        .then(data => data.json())
+        .then(res => console.log(res));
 
 
+    //  slider 
+    // const slider = document.querySelectorAll('.offer__slide'),
+    //     prev = document.querySelector('.offer__slider-prev'),
+    //     next = document.querySelector('.offer__slider-next'),
+    //     total = document.querySelector('#total'),
+    //     current = document.querySelector('#current');
+    // // индекс, котоырй определяет какой сейчас слайде 
+    // let slideIndex= 1;  
+
+    // // вызываем функцию с текущим индксом слайда 
+    // showSlides(slideIndex);
+
+    // if (slider.length < 10) {
+    //     total.textContent = `0${slider.length}`;
+    // } else {
+    //     total.textContent = `${slider.length}`;
+    // }
+
+    // // по показу и скрытию слайдов (n-слайд индекс который к нам приходит)
+    // function showSlides(n) {
+    //     // првоеряем граничные значения 
+    //     if (n > slider.length) {
+    //         slideIndex= 1;
+    //     }
+
+    //     if (n < 1) {
+    //         slideIndex = slider.length;
+    //     }
+
+    //     slider.forEach(item => item.style.display = 'none');
+
+    //     slider[slideIndex - 1].style.display = 'block';
+
+    //     if (slider.length < 10) {
+    //         current.textContent = `0${slideIndex}`;
+    //     } else {
+    //         current.textContent = slideIndex;
+    //     }
+    // }
+
+    // // функция кооаря вызывает функцию showSlides 
+    // function plusSlides(n) {
+    //     showSlides(slideIndex += n);
+    // }
+
+    // // назанчаем обработчик событйи на кнопки 
+
+    // prev.addEventListener('click', () => {
+    //     plusSlides(-1);
+    // });
+
+    // next.addEventListener('click', () => {
+    //     plusSlides(1);
+    // });
+
+
+
+    // slider carusel  
+    const slides = document.querySelectorAll('.offer__slide'),
+        slider = document.querySelector('.offer__slider'),
+        prev = document.querySelector('.offer__slider-prev'),
+        next = document.querySelector('.offer__slider-next'),
+        total = document.querySelector('#total'),
+        current = document.querySelector('#current'),
+        slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+        width = window.getComputedStyle(slidesWrapper).width,
+        slidesField = document.querySelector('.offer__slider-inner');
+
+    // индекс, котоырй определяет какой сейчас слайде 
+    let slideIndex = 1;
+    // создаем отступ, чтобы понять на сколько мы отступили после использвоания transform 
+    let offset = 0;
+
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+        current.textContent = `0${slideIndex}`;
+    } else {
+        total.textContent = `${slides.length}`;
+        current.textContent = { slideIndex };
+    }
+
+    slidesField.style.width = 100 * slides.length + '%';
+    slidesField.style.display = 'flex';
+    slidesField.style.transition = '0.5s all';
+
+    slidesWrapper.style.overflow = 'hidden';
+
+    // устанавиаем каждмоу слайду нужную нам ширину, чтобы они были одинаковые 
+    slides.forEach(slide => {
+        slide.style.width = width;
+    });
+
+    // обработчик событий для передвижения слайдов 
+
+    next.addEventListener('click', () => {
+        // превращаем строку к примеру '500px' в 500 используя +width.slice(0, width.length - 2)
+        if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+            offset = 0;
+        } else {
+            offset += +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == slides.length) {
+            slideIndex = 1;
+        } else {
+            slideIndex++;
+        }
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+
+        dots.forEach(dot => dot.style.opacity = '0.5');
+        dots[slideIndex - 1].style.opacity = 1;
+    });
+
+    prev.addEventListener('click', () => {
+        // превращаем строку к примеру '500px' в 500 используя +width.slice(0, width.length - 2)
+        if (offset == 0) {
+            offset = +width.slice(0, width.length - 2) * (slides.length - 1);
+        } else {
+            offset -= +width.slice(0, width.length - 2);
+        }
+
+        slidesField.style.transform = `translateX(-${offset}px)`;
+
+        if (slideIndex == 1) {
+            slideIndex = slides.length;
+        } else {
+            slideIndex--;
+        }
+
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+
+        dots.forEach(dot => dot.style.opacity = '0.5');
+        dots[slideIndex - 1].style.opacity = 1;
+    });
+
+
+    // pagination 
+
+    // 1 получаем весь слайдер со страницы
+    // 2 задаем ему position relative 
+    // 3 создаем обертку для точек
+    // 4 при помощи цикла создаем колчиесвто тчоек равнео количеству слайдов
+
+    slider.style.position = 'relative';
+
+    const indicators = document.createElement('ol'),
+        dots = [];
+
+    indicators.classList.add('carousel-indicators');
+
+    indicators.style.cssText = `
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 15;
+        display: flex;
+        justify-content: center;
+        margin-right: 15%;
+        margin-left: 15%;
+        list-style: none;
+    `;
+
+    slider.append(indicators);
+
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('li');
+        // устанавлвиаем атрибут чтоыб понять какая тчока к какому слайду идет 
+        dot.setAttribute('data-slide-to', i + 1);
+        dot.style.cssText = `
+        box-sizing: content-box;
+        flex: 0 1 auto;
+        width: 30px;
+        height: 6px;
+        margin-right: 3px;
+        margin-left: 3px;
+        cursor: pointer;
+        background-color: #fff;
+        background-clip: padding-box;
+        border-top: 10px solid transparent;
+        border-bottom: 10px solid transparent;
+        opacity: .5;
+        transition: opacity .6s ease;
+        `;
+        if (i == 0) {
+            dot.style.opacity = 1;
+        }
+        indicators.append(dot);
+        dots.push(dot);
+    }
+
+    // функционал для точек при клкие 
+    dots.forEach(dot => {
+        dot.addEventListener('click', (e) => {
+            const slideTo = e.target.getAttribute('data-slide-to');
+
+            slideIndex = slideTo;
+
+            offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+
+            slidesField.style.transform = `translateX(-${offset}px)`;
+
+
+            if (slides.length < 10) {
+                current.textContent = `0${slideIndex}`;
+            } else {
+                current.textContent = slideIndex;
+            }
+
+            dots.forEach(dot => dot.style.opacity = '0.5');
+            dots[slideIndex - 1].style.opacity = 1;
+
+        });
+    });
 });
 
 
